@@ -1,0 +1,49 @@
+class LRUCache {
+public:
+    LRUCache(int capacity) {
+        cap = capacity;
+    }
+    
+    int get(int key) {
+    
+        if (cache.find(key) == cache.end()) {
+            return -1;
+        }
+
+        int value = cache[key].first;
+        order.erase(cache[key].second);
+        order.push_front(key);
+
+        cache[key].second = order.begin();
+        
+        return value;
+    }
+    
+    void put(int key, int value) {
+       
+        if (cache.find(key) != cache.end()) {
+            
+            cache[key].first = value;
+            
+            order.erase(cache[key].second);
+            order.push_front(key);
+            cache[key].second = order.begin();
+        } else {
+           
+            if (cache.size() >= cap) {
+                int lru_key = order.back();
+                order.pop_back();
+                cache.erase(lru_key);
+            }
+            
+    
+            order.push_front(key);
+            cache[key] = {value, order.begin()};
+        }
+    }
+
+private:
+    int cap;  
+    std::list<int> order;  
+    std::unordered_map<int, std::pair<int, std::list<int>::iterator>> cache; 
+};

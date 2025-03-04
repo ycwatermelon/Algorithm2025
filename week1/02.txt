@@ -1,0 +1,69 @@
+class LFUCache {
+public:
+    LFUCache(int capacity) {
+        cap = capacity;
+        minFreq = 0;
+    }
+    
+    int get(int key) {
+        if (keyMap.find(key) == keyMap.end()) {
+            return -1;
+        }
+        
+        int value = keyMap[key].value;
+        int freq = keyMap[key].freq;
+
+        freqMap[freq].erase(keyPos[key]);
+        if (freqMap[freq].empty()) {
+            freqMap.erase(freq);
+            if (freq == minFreq) {
+                minFreq++;
+            }
+        }
+
+        freq++;
+        freqMap[freq].push_front(key);
+        keyPos[key] = freqMap[freq].begin();
+        keyMap[key].freq = freq;
+        
+        return value;
+    }
+    
+    void put(int key, int value) {
+        if (cap == 0) return;
+
+        if (keyMap.find(key) != keyMap.end()) {
+            keyMap[key].value = value;
+            get(key);  
+            return;
+        }
+        
+                if (keyMap.size() >= cap) {
+
+            int keyToRemove = freqMap[minFreq].back();
+            freqMap[minFreq].pop_back();
+            if (freqMap[minFreq].empty()) {
+                freqMap.erase(minFreq);
+            }
+            keyMap.erase(keyToRemove);
+            keyPos.erase(keyToRemove);
+        }
+
+        minFreq = 1;
+        keyMap[key] = {value, 1};
+        freqMap[1].push_front(key);
+        keyPos[key] = freqMap[1].begin();
+    }
+
+private:
+    struct Node {
+        int value;
+        int freq;
+    };
+    
+    int cap;
+    int minFreq;
+    unordered_map<int, Node> keyMap;
+    unordered_map<int, list<int>> freqMap;
+    unordered_map<int, list<int>::iterator> keyPos;
+};
