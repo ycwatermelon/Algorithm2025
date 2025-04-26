@@ -1,0 +1,44 @@
+class Solution {
+public:
+    vector<int> sumOfDistancesInTree(int n, vector<vector<int>>& edges) {
+
+        vector<vector<int>> tree(n);
+        for (auto& edge : edges) {
+            tree[edge[0]].push_back(edge[1]);
+            tree[edge[1]].push_back(edge[0]);
+        }
+
+        vector<int> count(n, 1);
+        vector<int> result(n, 0);
+
+        dfs1(0, -1, tree, count, result);
+
+        dfs2(0, -1, n, tree, count, result);
+        
+        return result;
+    }
+    
+private:
+
+    void dfs1(int node, int parent, vector<vector<int>>& tree, vector<int>& count, vector<int>& result) {
+        for (int child : tree[node]) {
+            if (child != parent) {
+                dfs1(child, node, tree, count, result);
+
+                count[node] += count[child];
+                result[node] += result[child] + count[child];
+            }
+        }
+    }
+
+    void dfs2(int node, int parent, int n, vector<vector<int>>& tree, vector<int>& count, vector<int>& result) {
+        for (int child : tree[node]) {
+            if (child != parent) {
+
+                result[child] = result[node] - count[child] + (n - count[child]);
+
+                dfs2(child, node, n, tree, count, result);
+            }
+        }
+    }
+};
