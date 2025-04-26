@@ -1,0 +1,52 @@
+class Solution {
+public:
+    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
+
+        if (source == target) return 0;
+        unordered_map<int, vector<int>> stopToBus;
+        
+        for (int busId = 0; busId < routes.size(); busId++) {
+            for (int stop : routes[busId]) {
+                stopToBus[stop].push_back(busId);
+            }
+        }
+
+        queue<int> stops;
+        stops.push(source);
+        
+        unordered_set<int> visitedStops;
+        visitedStops.insert(source);
+        
+        unordered_set<int> visitedBuses; 
+        
+        int buses = 0; 
+
+        while (!stops.empty()) {
+            int size = stops.size();
+
+            for (int i = 0; i < size; i++) {
+                int currentStop = stops.front();
+                stops.pop();
+
+                for (int busId : stopToBus[currentStop]) {
+                    if (visitedBuses.count(busId)) continue;
+                    visitedBuses.insert(busId);
+
+                    for (int nextStop : routes[busId]) {
+
+                        if (nextStop == target) return buses + 1;
+
+                        if (visitedStops.count(nextStop)) continue;
+
+                        visitedStops.insert(nextStop);
+                        stops.push(nextStop);
+                    }
+                }
+            }
+
+            buses++;
+        }
+
+        return -1;
+    }
+};
