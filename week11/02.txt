@@ -1,0 +1,48 @@
+class ExamRoom {
+public:
+    ExamRoom(int n) : n(n) {
+    }
+    
+    int seat() {
+        int student = 0;
+        
+        if (!seats.empty()) {
+            int maxDist = *seats.begin();
+            int prev = -1; 
+            
+            for (int seat : seats) {
+                if (prev != -1) {
+    
+                    int dist = (seat - prev) / 2;
+                    if (dist > maxDist) {
+                        maxDist = dist;
+                        student = prev + dist;
+                    }
+                }
+                prev = seat;
+            }
+
+            if (n - 1 - *seats.rbegin() > maxDist) {
+                student = n - 1;
+            }
+        }
+        
+        seats.insert(student); 
+        return student; 
+    }
+    
+    void leave(int p) {
+        seats.erase(p); 
+    }
+
+private:
+    int n;
+    std::set<int> seats; 
+};
+
+/**
+ * Your ExamRoom object will be instantiated and called as such:
+ * ExamRoom* obj = new ExamRoom(n);
+ * int param_1 = obj->seat();
+ * obj->leave(p);
+ */
