@@ -1,0 +1,64 @@
+class Solution {
+public:
+    vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
+        int n = edges.size();
+        vector<int> parent(n + 1, 0);
+        vector<int> root(n + 1, 0); 
+        vector<int> size(n + 1, 1); 
+        vector<int> conflictEdge; 
+        vector<int> cycleEdge;    
+
+        for (int i = 1; i <= n; ++i) {
+            root[i] = i;
+        }
+
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1];
+            if (parent[v] != 0) {
+
+                conflictEdge = edge;
+            } else {
+                parent[v] = u;
+                if (!unionNodes(root, size, u, v)) {
+
+                    cycleEdge = edge;
+                }
+            }
+        }
+
+        if (!conflictEdge.empty()) {
+            if (!cycleEdge.empty()) {
+                return {parent[conflictEdge[1]], conflictEdge[1]};
+            } else {
+
+                return conflictEdge;
+            }
+        }
+
+        return cycleEdge;
+    }
+
+private:
+  
+    int findRoot(vector<int>& root, int x) {
+        if (root[x] != x) {
+            root[x] = findRoot(root, root[x]);
+        }
+        return root[x];
+    }
+
+   
+    bool unionNodes(vector<int>& root, vector<int>& size, int u, int v) {
+        int rootU = findRoot(root, u);
+        int rootV = findRoot(root, v);
+        if (rootU == rootV) return false;
+        if (size[rootU] > size[rootV]) {
+            root[rootV] = rootU;
+            size[rootU] += size[rootV];
+        } else {
+            root[rootU] = rootV;
+            size[rootV] += size[rootU];
+        }
+        return true;
+    }
+};
