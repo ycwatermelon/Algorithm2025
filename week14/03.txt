@@ -1,0 +1,64 @@
+class Solution {
+public:
+    int maxTaskAssign(vector<int>& tasks, vector<int>& workers, int pills, int strength) {
+        sort(tasks.begin(), tasks.end());
+        sort(workers.begin(), workers.end());
+        
+        int left = 0, right = min(tasks.size(), workers.size());
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            
+            if (canAssign(tasks, workers, pills, strength, mid)) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        
+        return right;
+    }
+    
+    bool canAssign(vector<int>& tasks, vector<int>& workers, int pills, int strength, int k) {
+
+        vector<int> selectedTasks(tasks.begin(), tasks.begin() + k);
+ 
+        deque<int> dq;
+        for (int i = workers.size() - k; i < workers.size(); i++) {
+            dq.push_back(workers[i]);
+        }
+ 
+        int pillsLeft = pills;
+        
+        for (int i = k - 1; i >= 0; i--) {
+            int task = selectedTasks[i];
+
+            if (dq.back() >= task) {
+                dq.pop_back();
+                continue;
+            }
+
+            if (pillsLeft <= 0) return false;
+
+            int left = 0, right = dq.size() - 1;
+            int pos = -1;
+            
+            while (left <= right) {
+                int mid = left + (right - left) / 2;
+                
+                if (dq[mid] + strength >= task) {
+                    pos = mid;
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            }
+            
+            if (pos == -1) return false;
+            dq.erase(dq.begin() + pos);
+            pillsLeft--;
+        }
+        
+        return true;
+    }
+};
